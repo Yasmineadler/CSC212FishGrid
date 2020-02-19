@@ -57,13 +57,20 @@ public class FishGame {
 		// Add a home!
 		home = world.insertFishHome();
 		
-		// TODO(lab) Generate some more rocks!
-		// TODO(lab) Make 5 into a constant, so it's easier to find & change.
-		for (int i=0; i<5; i++) {
+		int NUM_ROCKS = 10;
+		for (int i=0; i<NUM_ROCKS; i++) {
 			world.insertRockRandomly();
 		}
 		
-		// TODO(lab) Make the snail!
+		int NUM_FALLING_ROCKS = 5;
+		for (int i=0; i<NUM_FALLING_ROCKS; i++) {
+			world.insertFallingRockRandomly();
+		}
+		
+		int NUM_SNAILS = 2;
+		for (int i=0; i<NUM_SNAILS; i++) {
+			world.insertSnailRandomly();
+		}
 		
 		// Make the player out of the 0th fish color.
 		player = new Fish(0, world);
@@ -75,6 +82,9 @@ public class FishGame {
 		// Generate fish of all the colors but the first into the "missing" List.
 		for (int ft = 1; ft < Fish.COLORS.length; ft++) {
 			Fish friend = world.insertFishRandomly(ft);
+			if (ft<4) {
+				friend.markAsFastScared();
+			}
 			missing.add(friend);
 		}		
 	}
@@ -120,14 +130,14 @@ public class FishGame {
 				Fish justFound = (Fish) wo;
 				
 				// Remove from world.
-				justFound.remove();
 				// TODO(lab): add to found instead! (So we see objectsFollow work!)
 				
 				// Remove from missing list.
 				missing.remove(justFound);
+				found.add(justFound);
 				
 				// Increase score when you find a fish!
-				score += 10;
+				score = score + justFound.points;
 			}
 		}
 		
@@ -146,8 +156,15 @@ public class FishGame {
 		Random rand = ThreadLocalRandom.current();
 		for (Fish lost : missing) {
 			// 30% of the time, lost fish move randomly.
-			if (rand.nextDouble() < 0.3) {
-				// TODO(lab): What goes here?
+			if (lost.fastScared == false) {
+				if (rand.nextDouble() < 0.3) {
+					lost.moveRandomly();
+				}
+			} else {
+				if (rand.nextDouble() < 0.8) {
+					lost.moveRandomly();
+					System.out.println(lost);
+				}
 			}
 		}
 	}
@@ -159,10 +176,17 @@ public class FishGame {
 	 */
 	public void click(int x, int y) {
 		// TODO(FishGrid) use this print to debug your World.canSwim changes!
-		System.out.println("Clicked on: "+x+","+y+ " world.canSwim(player,...)="+world.canSwim(player, x, y));
-		List<WorldObject> atPoint = world.find(x, y);
+		List<WorldObject> atPoint = world.find(x,y);
+		if (world.canSwim(player, x, y) == false) {
+			if ((atPoint.get(0).getClass().getSimpleName()) != "Snail" ) {
+				System.out.println(atPoint.get(0).getClass().getSimpleName());
+				atPoint.get(0).remove();
+			} 
+		}
+		
+		
+		
 		// TODO(FishGrid) allow the user to click and remove rocks.
-
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
+
 /**
  * Most Fish behavior lives up in WorldObject (a Fish just looks special!).
  * Or it is in Main, where the missing/found and player fish all act different!
@@ -18,8 +19,15 @@ public class Fish extends WorldObject {
 	static Color[] COLORS = {
 			Color.red,
 			Color.green,
-			Color.yellow
-			// TODO: (lab) Add more colors.
+			Color.yellow,
+			Color.blue,
+			Color.gray,
+			Color.magenta,
+			Color.cyan, 
+			Color.orange,
+			Color.pink,
+			Color.white,
+			Color.black
 			// TODO: (FishGrid) Maybe make a special fish that is more points?
 	};
 	/**
@@ -31,6 +39,10 @@ public class Fish extends WorldObject {
 	 */
 	boolean player = false;
 	
+	boolean fastScared = false;
+	
+	int points;
+	
 	/**
 	 * Called only on the Fish that is the player!
 	 */
@@ -38,7 +50,9 @@ public class Fish extends WorldObject {
 		this.player = true;
 	}
 
-
+	public void markAsFastScared() {
+		this.fastScared = true;
+	}
 	/**
 	 * A Fish knows what World it belongs to, because all WorldObjects do.
 	 * @param color Color by number.
@@ -47,6 +61,7 @@ public class Fish extends WorldObject {
 	public Fish(int color, World world) {
 		super(world);
 		this.color = color;
+		this.points = color * 5;
 	}
 	
 	/**
@@ -90,6 +105,7 @@ public class Fish extends WorldObject {
 			flipped.setColor(new Color(1f,1f,1f,0.5f));
 			flipped.fill(circle);
 		}
+		
 
 		// Draw the fish of size (1x1, roughly, at 0,0).
 		flipped.setColor(color);

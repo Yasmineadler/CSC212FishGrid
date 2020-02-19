@@ -93,6 +93,11 @@ public class World {
 		items.remove(item);
 	}
 	
+	public void onlyremove(WorldObject item) {
+		if (item.getClass().getSimpleName() == "Rock") {
+			items.remove(item);
+		}
+	}
 	/**
 	 * How big is the world we model?
 	 * @return the width.
@@ -157,6 +162,11 @@ public class World {
 		return r;
 	}
 	
+	public FallingRock insertFallingRockRandomly() {
+		FallingRock r = new FallingRock(this);
+		insertRandomly(r);
+		return r;
+	}
 	/**
 	 * Insert a new Fish into the world at random of a specific color.
 	 * @param color - the color of the fish.
@@ -204,13 +214,30 @@ public class World {
 		List<WorldObject> inSpot = this.find(x, y);
 		
 		for (WorldObject it : inSpot) {
-			// TODO(FishGrid): Don't let us move over rocks as a Fish.
 			// The other fish shouldn't step "on" the player, the player should step on the other fish.
+			
 			if (it instanceof Snail) {
 				// This if-statement doesn't let anyone step on the Snail.
 				// The Snail(s) are not gonna take it.
 				return false;
 			}
+			if (it instanceof Rock) {
+				// This if-statement doesn't let anyone step on the Rock.
+				return false;
+			}
+			if (it instanceof FallingRock) {
+				// This if-statement doesn't let anyone step on the FallingRock.
+				return false;
+			}
+			if (it instanceof Fish) {
+				// This if-statement doesn't let anyone step on the Fishes.
+				if (isPlayer) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			
 		}
 		
 		// If we didn't see an obstacle, we can move there!
@@ -233,16 +260,22 @@ public class World {
 	 * @param followers a set of objects to follow the leader.
 	 */
 	public static void objectsFollow(WorldObject target, List<? extends WorldObject> followers) {
-		// TODO(FishGrid) Comment this method!
-		// Q1. What is recentPositions?
-		// Q2. What is followers?
-		// Q3. What is target?
-		// Q4. Why is past = putWhere[i+1]? Why not putWhere[i]?
+		// Q1. What is recentPositions? recentPositions is the recent position of the player fish. 
+		//		It is used to make sure the other fish can follow the leader. 
+		// Q2. What is followers? The set of fish that have been found.
+		// Q3. What is target? Target is the player fish. 
+		// Q4. Why is past = putWhere[i+1]? Why not putWhere[i]? Because you want to put the fish 
+		//		where the fish in front of it was, not where it is. 
 		List<IntPoint> putWhere = new ArrayList<>(target.recentPositions);
 		for (int i=0; i < followers.size() && i+1 < putWhere.size(); i++) {
 			// Q5. What is the deal with the two conditions in this for-loop?
 			// Conditions are in the "while" part of this loop.
-			
+			// i<followers.size() is to make sure that all of the fish are put through the loop once
+			// 		and that it stops when they have all gone through.
+			// i+1 < putwhere.size() is to make sure that the fish can't pick up a fish accidentally 
+			//		at the beginning.
+			System.out.println(putWhere.size());
+			System.out.println(i);
 			IntPoint past = putWhere.get(i+1);
 			followers.get(i).setPosition(past.x, past.y);
 		}
